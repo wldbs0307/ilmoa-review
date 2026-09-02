@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>표준사업장 잡맵 | 지역별 취업처 안내</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  .sticky-top{position:sticky;top:0;z-index:10;background:var(--paper);}
+  :root{
+    --ink:#1D3330;
+    --ink-soft:#3E5652;
+    --paper:#F6F4EE;
+    --paper-raise:#FFFFFF;
+    --line:#DCD6C6;
+    --amber:#DD8A2E;
+    --amber-deep:#B96E1C;
+    --sage:#7C9A85;
+    --sage-soft:#E4EBE1;
+    --danger:#B5482F;
+    --radius:10px;
+    font-family:'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);}
+  ::selection{background:var(--amber);color:#fff;}
+
+  header.top{
+    background:var(--ink);
+    color:#EFEAE0;
+    padding:28px 20px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.top::after{
+    content:"";
+    position:absolute; right:-40px; top:-60px;
+    width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle, rgba(221,138,46,0.28), transparent 70%);
+  }
+  .top-inner{max-width:1180px;margin:0 auto;padding:0 20px;position:relative;display:grid;grid-template-columns:1fr 1.8fr;gap:28px;align-items:center;}
+  .eyebrow-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .badge-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block;}
+  header.top .kicker{font-size:13px;letter-spacing:.02em;color:#C9C2AE;}
+  header.top h1{font-size:clamp(24px,4vw,34px);margin:2px 0 8px;font-weight:800;letter-spacing:-0.01em;}
+  header.top p{margin:0;max-width:640px;font-size:14.5px;line-height:1.6;color:#D8D2C2;}
+  .stat-row{display:flex;gap:22px;margin-top:18px;flex-wrap:wrap;}
+  .stat{font-size:13px;color:#C9C2AE;}
+  .stat b{display:block;font-size:22px;color:#fff;font-weight:800;}
+
+  .controls{
+    max-width:1180px;margin:10px auto 0;padding:0 20px;position:relative;z-index:3;
+  }
+  .control-card{
+    background:var(--paper-raise);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    box-shadow:0 10px 24px -18px rgba(29,51,48,0.35);
+  }
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .search-box{flex:1;min-width:220px;position:relative;}
+  .search-box input{
+    width:100%;padding:10px 14px 10px 34px;border-radius:8px;border:1px solid var(--line);
+    font-size:14px;background:var(--paper);color:var(--ink);
+  }
+  .search-box input:focus{outline:2px solid var(--amber);outline-offset:1px;}
+  .search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5;}
+
+  select.region-select{
+    width:170px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);
+    font-size:14px;background:var(--paper);color:var(--ink);font-weight:600;
+  }
+
+  .chip-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;}
+  .chip{
+    padding:6px 12px;border-radius:100px;border:1px solid var(--line);
+    background:var(--paper);font-size:12.5px;cursor:pointer;color:var(--ink-soft);
+    transition:.15s; user-select:none;
+  }
+  .chip:hover{border-color:var(--amber);}
+  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .chip.type-chip.active{background:var(--sage);border-color:var(--sage);color:#173026;}
+
+  .meta-line{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:12.5px;color:var(--ink-soft);}
+  .clear-link{cursor:pointer;color:var(--amber-deep);font-weight:600;}
+  .clear-link:hover{text-decoration:underline;}
+
+  main{max-width:1180px;margin:0 auto;padding:22px 20px 80px;}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:12px;
+  }
+  .card{
+    background:var(--paper-raise);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 15px 13px;
+    cursor:pointer;
+    transition:transform .12s, box-shadow .12s, border-color .12s;
+    display:flex;flex-direction:column;gap:7px;
+  }
+  .card:hover{transform:translateY(-2px);box-shadow:0 12px 20px -14px rgba(29,51,48,0.4);border-color:var(--amber);}
+  .card .name-row{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;}
+  .card .name{font-weight:700;font-size:15px;line-height:1.35;}
+  .type-tag{font-size:10.5px;padding:2px 7px;border-radius:5px;white-space:nowrap;font-weight:700;}
+  .type-tag.branch{background:var(--sage-soft);color:#3C6249;}
+  .type-tag.main{background:#F1E6D5;color:var(--amber-deep);}
+  .card .addr{font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+  .card .industry{font-size:12.5px;color:var(--ink);line-height:1.5;
+    overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-clamp:2;}
+  .card .tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px;}
+  .mini-tag{font-size:10.5px;background:var(--paper);border:1px solid var(--line);color:var(--ink-soft);
+    padding:2px 7px;border-radius:100px;}
+  .cat-tag{background:#EDF2EA;border-color:#D6E2D0;color:#43604C;}
+
+  .empty-state{padding:60px 20px;text-align:center;color:var(--ink-soft);}
+  .empty-state .big{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+
+  .load-more{display:block;margin:26px auto 0;padding:11px 26px;border-radius:100px;
+    border:1px solid var(--line);background:var(--paper-raise);cursor:pointer;font-weight:600;font-size:13.5px;color:var(--ink);}
+  .load-more:hover{border-color:var(--amber);color:var(--amber-deep);}
+
+  /* drawer */
+  .overlay{position:fixed;inset:0;background:rgba(20,32,29,0.42);opacity:0;pointer-events:none;transition:opacity .18s;z-index:20;}
+  .overlay.show{opacity:1;pointer-events:auto;}
+  .drawer{
+    position:fixed;top:0;right:0;height:100%;width:min(440px,100%);
+    background:var(--paper-raise);z-index:21;
+    transform:translateX(100%);transition:transform .22s ease;
+    display:flex;flex-direction:column;
+    box-shadow:-14px 0 40px rgba(0,0,0,0.18);
+  }
+  .drawer.show{transform:translateX(0);}
+  .drawer-head{
+    background:var(--ink);color:#fff;padding:20px 20px 16px;position:relative;flex-shrink:0;
+  }
+  .drawer-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;
+    background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:16px;cursor:pointer;}
+  .drawer-close:hover{background:rgba(255,255,255,0.22);}
+  .drawer-head .tags{display:flex;gap:6px;margin-bottom:8px;}
+  .drawer-head h2{margin:0;font-size:19px;font-weight:800;line-height:1.35;padding-right:30px;}
+  .drawer-body{flex:1;overflow-y:auto;padding:18px 20px 30px;}
+  .section{margin-bottom:22px;}
+  .section h3{font-size:11.5px;text-transform:none;letter-spacing:.02em;color:var(--amber-deep);
+    font-weight:800;margin:0 0 8px;display:flex;align-items:center;gap:6px;}
+  .info-line{font-size:13.5px;line-height:1.7;color:var(--ink);}
+  .info-line .lbl{color:var(--ink-soft);display:inline-block;min-width:70px;}
+  .btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .btn{padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:var(--paper);
+    font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+  .btn:hover{border-color:var(--amber);color:var(--amber-deep);}
+  .btn.primary{background:var(--amber);border-color:var(--amber);color:#fff;}
+  .btn.primary:hover{background:var(--amber-deep);border-color:var(--amber-deep);color:#fff;}
+
+  .photo-box{
+    border:1.5px dashed var(--line);border-radius:var(--radius);
+    aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;
+    background:var(--paper);overflow:hidden;position:relative;color:var(--ink-soft);font-size:12.5px;
+    flex-direction:column;gap:6px;
+  }
+  .photo-box img{width:100%;height:100%;object-fit:cover;}
+  .photo-url-row{display:flex;gap:6px;margin-top:8px;}
+  .photo-url-row input{flex:1;padding:8px 10px;border-radius:7px;border:1px solid var(--line);font-size:12.5px;}
+
+  textarea, input.field, select.field{
+    width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--line);
+    font-size:13.5px;font-family:inherit;color:var(--ink);background:var(--paper);
+    resize:vertical;
+  }
+  textarea:focus, input.field:focus, select.field:focus, .photo-url-row input:focus{outline:2px solid var(--amber);outline-offset:1px;}
+  .field-label{font-size:12px;font-weight:700;color:var(--ink-soft);margin:12px 0 5px;display:block;}
+  .field-label:first-child{margin-top:0;}
+  .save-bar{position:sticky;bottom:-30px;background:var(--paper-raise);padding-top:10px;}
+  .save-btn{width:100%;padding:11px;border-radius:8px;border:none;background:var(--ink);color:#fff;
+    font-weight:700;font-size:14px;cursor:pointer;}
+  .save-btn:hover{background:#0f221f;}
+  .save-note{font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:8px;line-height:1.5;}
+  .saved-flash{color:#3C6249;font-weight:700;}
+
+  .cat-badges{display:flex;flex-wrap:wrap;gap:6px;}
+  .cat-badge{font-size:11.5px;background:var(--sage-soft);color:#3C6249;padding:4px 9px;border-radius:100px;font-weight:600;}
+  .type-badge{font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px;}
+  .type-badge.main{background:#F1E6D5;color:var(--amber-deep);}
+  .type-badge.branch{background:var(--sage-soft);color:#3C6249;}
+  .cert-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;background:rgba(255,255,255,0.14);color:#fff;}
+
+  footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;font-size:12px;color:var(--ink-soft);line-height:1.7;}
+
+  @media (max-width:640px){
+    .drawer{width:100%;}
+    header.top{padding:22px 16px 18px;}
+    .controls{padding:0 12px;}
+    main{padding:18px 12px 70px;}
+  }
+  .map-wrap{height:300px;border-radius:14px;overflow:hidden;background:#e9e7df;border:1px solid rgba(255,255,255,.12);}
+  #map{width:100%;height:100%;}
+</style>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b42bc6f3ca322517f78d82b19345edd7&libraries=services,clusterer"></script>
+</head>
+<body>
+
+<div class="sticky-top">
+  <header class="top">
+  <div class="top-inner">
+    <div class="top-info">
+    <div class="eyebrow-row"><span class="badge-dot"></span><span class="kicker">전공과·고등학교 3학년· 장애인 표준사업장 데이터</span></div>
+    <h1>일 모 아</h1>
+    <p>김포·고양·파주·강서 지역의 장애인 표준사업장 정보를 한곳에 모았어요.</p>
+    <div class="stat-row">
+      <div class="stat"><b id="statRegions">4</b>개 지역</div>
+      <div class="stat"><b id="statTotal">-</b>전체 사업장</div>
+      <div class="stat"><b id="statFiltered">-</b>현재 목록</div>
+    </div>
+  </div>
+      <div class="map-wrap">
+      <div id="map"></div>
+    </div>
+</header>
+
+<div class="controls">
+  <div class="control-card">
+    <div class="row">
+      <div class="search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="text" placeholder="사업체명, 주소, 업종으로 검색">
+      </div>
+      <select id="districtSelect" class="region-select">
+        <option value="ALL">전체 지역</option>
+      </select>
+      <select id="sortSelect" class="region-select">
+  <option value="name">이름순</option>
+  <option value="nameDesc">이름순 역순</option>
+  <option value="dateDesc">인증년도 최신순</option>
+  <option value="dateAsc">인증년도 오래된순</option>
+</select>
+    </div>
+    <div class="chip-row" id="typeChipRow">
+      <span class="chip type-chip active" data-type="ALL">전체 유형</span>
+      <span class="chip type-chip" data-type="자회사">자회사</span>
+      <span class="chip type-chip" data-type="일반">일반</span>
+    </div>
+    <div class="chip-row" id="catChipRow"></div>
+    <div class="meta-line">
+      <span id="resultCount">-</span>
+      <span class="clear-link" id="clearBtn">필터 초기화</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<main>
+  <div class="grid" id="cardGrid"></div>
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="big">조건에 맞는 사업장이 없어요</div>
+    <div>검색어나 필터를 조정해 보세요.</div>
+  </div>
+  <button class="load-more" id="loadMoreBtn" style="display:none;">더 많은 사업장 보기</button>
+</main>
+
+<footer>
+  출처: 한국장애인고용공단 장애인 표준사업장 인증업체 명단 (2026년 2분기, 26.06.30 기준 / 26.08.16 수정) · 분사무소 정보 포함 · 인증 취소 사업체는 제외했습니다.
+  김포시·고양시·파주시·서울 강서구 소재 사업장만 모았습니다. 실제 채용 여부·근무조건은 사업체에 직접 문의해 확인해 주세요.
+  홈페이지·복지·근무조건·사업장 규모·사진 정보는 이용자가 직접 입력하며, 이 브라우저(계정)에만 저장됩니다.
+</footer>
+
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <button class="drawer-close" id="drawerClose">✕</button>
+    <div class="tags" id="drawerTags"></div>
+    <h2 id="drawerName">-</h2>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<script>
+const JOBS = [{"id":"제2013-070호","cert_no":"제2013-070호","name":"린텍스기업주식회사","region":"경기","address":"경기도 파주시 법원읍 술이홀로 960-1 린텍스기업주식회사","agency":"경기북부지사","cert_date":"2013-06-19","phone":"031-959-9934","industry":"세탁업","industry_cat":["세탁업"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2013-103호","cert_no":"제2013-103호","name":"주식회사 명지위드","region":"경기","address":"경기도 고양시 덕양구 호국로 630","agency":"경기북부지사","cert_date":"2013-07-05","phone":"031-810-5146","industry":"서비스업(콜센터, 의무기록관리)","industry_cat":["콜센터/사무지원"],"category":"자회사","type":"본점","district":"고양시"},{"id":"제2013-130호","cert_no":"제2013-130호","name":"미문산업","region":"경기","address":"경기도 파주시 파주읍 술이홀로 33 미문산업","agency":"경기북부지사","cert_date":"2013-12-03","phone":"02-482-0936","industry":"제조업(우편박스, 주차스토퍼)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2015-042호","cert_no":"제2015-042호","name":"주식회사케이두레  (취소여부확인필요)","region":"서울","address":"서울특별시 강서구 강서로 468, 7층 701호(등촌동, 테크노타워)","agency":"서울남부지사","cert_date":"2015-11-27","phone":"02-2668-0311","industry":"서비스업(콜센터)","industry_cat":["콜센터/사무지원"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2015-053호","cert_no":"제2015-053호","name":"(주)태건비에프","region":"경기","address":"경기도 고양시 일산서구 덕산로57번길 37","agency":"경기북부지사","cert_date":"2015-12-29","phone":"031-923-6400","industry":"제조업(가설분전반)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2016-050호","cert_no":"제2016-050호","name":"(주)청호","region":"경기","address":"경기도 김포시 통진읍 김포대로1978번길 97","agency":"경기북부지사","cert_date":"2016-11-10","phone":"031-982-4537","industry":"제조업(육가공업)","industry_cat":["농림수산/식품가공","제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2016-057호","cert_no":"제2016-057호","name":"(주)대동소방","region":"경기","address":"경기도 김포시 양촌읍 양곡2로 133-11","agency":"경기북부지사","cert_date":"2016-12-12","phone":"031-989-8653","industry":"제조업(소화기약제 및 소화기계기구)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2017-011호","cert_no":"제2017-011호","name":"(주)모두락","region":"서울","address":"서울특별시 강서구 하늘길 70 1층 L103-2호(과해동, 항공지원센터)","agency":"서울남부지사","cert_date":"2017-06-13","phone":"070-7420-7497","industry":"사업지원서비스업(네일아트, 사내카페 등)","industry_cat":["카페/음식점"],"category":"자회사","type":"본점","district":"강서구"},{"id":"제2018-013호","cert_no":"제2018-013호","name":"(주)드림누리","region":"서울","address":"서울특별시 강서구 마곡중앙로 150(마곡동)","agency":"서울남부지사","cert_date":"2018-04-10","phone":"02-6924-1302","industry":"사업시설관리 및 사업지원서비스업","industry_cat":["시설관리/경비"],"category":"자회사","type":"본점","district":"강서구"},{"id":"제2018-030호","cert_no":"제2018-030호","name":"(사)아름다움나눔협회","region":"경기","address":"경기도 고양시 덕양구 호국로 787, 306호(주교동, 원당메디컬프라자)","agency":"경기북부지사","cert_date":"2018-06-28","phone":"070-4136-1991","industry":"제조업(CCTV, LED, 전광판 등)","industry_cat":["전기/조명/전자","제조업(기타)"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2018-053호","cert_no":"제2018-053호","name":"이케이산업","region":"경기","address":"경기도 파주시 조리읍 장곡리 602-16","agency":"경기북부지사","cert_date":"2018-11-16","phone":"031-941-8433","industry":"서비스업(세탁)","industry_cat":["세탁업"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2019-006호","cert_no":"제2019-006호","name":"(주)효성앤플러스","region":"경기","address":"경기도 김포시 양촌읍 황금3로 75","agency":"경기북부지사","cert_date":"2019-03-22","phone":"031-985-9827","industry":"제조업(LED조명), 도소매업(건축자재 등)","industry_cat":["전기/조명/전자","제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2019-040호","cert_no":"제2019-040호","name":"(주)참전유공자회","region":"경기","address":"경기도 김포시 통진읍 율마로 314, 가 나동","agency":"경기북부지사","cert_date":"2019-09-25","phone":"031-996-3081","industry":"제조업(배전반, 전기자동제어반 등)","industry_cat":["전기/조명/전자","제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2019-063호","cert_no":"제2019-063호","name":"(사)내일을여는멋진여성","region":"서울","address":"서울특별시 강서구 양천로 551-17, 911호(가양동, 한화비즈메트로1차)","agency":"서울남부지사","cert_date":"2019-12-09","phone":"02-761-7482","industry":"제조업(인쇄 출판 등)","industry_cat":["인쇄/출판/디자인","제조업(기타)"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2019-081호","cert_no":"제2019-081호","name":"장애인고용진흥회","region":"서울","address":"서울특별시 강서구 강서로 385, 8층, 804-6(마곡동, 우성에스비타워)","agency":"서울남부지사","cert_date":"2019-12-20","phone":"02-2666-4426","industry":"제조업(화장지, 마스크 등)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2020-016호","cert_no":"제2020-016호","name":"주식회사정문이엔이","region":"경기","address":"경기도 김포시 대곶면 산자뫼로 127-12","agency":"경기북부지사","cert_date":"2020-04-14","phone":"031-982-6720","industry":"제조업(상하수도 기계제작)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2020-049호","cert_no":"제2020-049호","name":"정도산업 주식회사","region":"경기","address":"경기도 파주시 파주읍 돈유1로 59-38","agency":"경기북부지사","cert_date":"2020-09-16","phone":"031-996-7753","industry":"제조업(건설자재, 도로시설물 등)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2020-067호","cert_no":"제2020-067호","name":"썬나노","region":"경기","address":"경기도 파주시 배리고개길 22-2, 1동 1층(아동동, 썬나노)","agency":"경기북부지사","cert_date":"2020-11-23","phone":"02-719-3287","industry":"제조업(단열에어캡, 썬팅)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2021-022호","cert_no":"제2021-022호","name":"(주)삼오전자","region":"경기","address":"경기도 파주시 장터고개길 180-5,180-11","agency":"경기북부지사","cert_date":"2021-05-10","phone":"032-623-5235","industry":"제조업(조명기구)","industry_cat":["전기/조명/전자","제조업(기타)"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2021-028호","cert_no":"제2021-028호","name":"(주)코이스","region":"서울","address":"서울특별시 강서구 마곡중앙14로 28 (마곡동, 코이스)","agency":"서울남부지사","cert_date":"2021-05-25","phone":"02-3488-8302","industry":"서비스업(온라인 광고대행)","industry_cat":["기타/서비스업"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2021-041호","cert_no":"제2021-041호","name":"(주)휴빔스","region":"경기","address":"경기도 파주시 광탄면 부흥로235번길 109","agency":"경기북부지사","cert_date":"2021-07-27","phone":"031-941-1739","industry":"제조업(전기조명기기)","industry_cat":["전기/조명/전자","제조업(기타)"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2021-053호","cert_no":"제2021-053호","name":"(주)천우티이엠","region":"경기","address":"경기도 김포시 양촌읍 서현로65번길 88","agency":"경기북부지사","cert_date":"2021-09-16","phone":"031-982-8384","industry":"제조업(분전반, 전기자재 등)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2021-062호","cert_no":"제2021-062호","name":"사단법인 에스디워크","region":"서울","address":"서울특별시 강서구 화곡로 416, 1118호(등촌동, 가양역 더스카이밸리 5차 지식산업센터)","agency":"서울남부지사","cert_date":"2021-10-27","phone":"02-2279-9938","industry":"제조업(인쇄, 판촉, 전자부품, 복사용지 등)","industry_cat":["인쇄/출판/디자인","전기/조명/전자","제조업(기타)"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2021-077호","cert_no":"제2021-077호","name":"주식회사 에이블위","region":"서울","address":"서울특별시 강서구 양천로 620, 1401~1403호","agency":"서울남부지사","cert_date":"2021-11-22","phone":"02-6959-1855","industry":"서비스업(건물위생관리)","industry_cat":["청소/미화"],"category":"자회사","type":"본점","district":"강서구"},{"id":"제2021-092호","cert_no":"제2021-092호","name":"주식회사 우리나눔","region":"경기","address":"경기도 파주시 초롱꽃로 17, 동패동","agency":"경기북부지사","cert_date":"2021-12-15","phone":"070-8811-8022","industry":"서비스업(도시농업교육, 농수산물 도소매업, 온라인판매 등)","industry_cat":["농림수산/식품가공"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2021-093호","cert_no":"제2021-093호","name":"세상 (주)","region":"경기","address":"경기도 파주시 광탄면 방축길 131-23","agency":"경기북부지사","cert_date":"2021-12-15","phone":"031-939-2301","industry":"세탁업(산업용 세탁)","industry_cat":["세탁업"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2022-009호","cert_no":"제2022-009호","name":"(주)아코퍼시스","region":"경기","address":"경기도 김포시 대곶면 대곶서로89번길 125-43","agency":"경기북부지사","cert_date":"2022-03-15","phone":"031-985-7575","industry":"제조업(가구)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2022-026호","cert_no":"제2022-026호","name":"사단법인행복일자리운동본부","region":"서울","address":"서울특별시 강서구 마곡중앙6로 66, 512호(마곡동, 퀸즈파크텐)","agency":"서울남부지사","cert_date":"2022-06-28","phone":"02-769-1030","industry":"제조업(인쇄, 판촉, 전자부품 등)","industry_cat":["인쇄/출판/디자인","전기/조명/전자","제조업(기타)"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2022-033호","cert_no":"제2022-033호","name":"(사)한빛장애인협회","region":"경기","address":"경기도 김포시 대곶면 산자뫼로 127-22","agency":"경기북부지사","cert_date":"2022-08-17","phone":"031-984-1661","industry":"제조업(폐수, 상하수 처리기자재)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2022-036호","cert_no":"제2022-036호","name":"솔로몬","region":"경기","address":"경기도 김포시 통진읍 율마로211번길 30","agency":"경기북부지사","cert_date":"2022-09-05","phone":"031-982-2116","industry":"제조업(주방가구)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2022-049호","cert_no":"제2022-049호","name":"주식회사 반들","region":"경기","address":"경기도 고양시 덕양구 꽃마을로 36, 11층 1116호(향동동, 디엠씨스타비즈 6에스티)","agency":"경기북부지사","cert_date":"2022-11-11","phone":"010-5181-6746","industry":"서비스업(자동차 세차)","industry_cat":["세차/차량관리","자동차부품"],"category":"자회사","type":"본점","district":"고양시"},{"id":"제2022-084호","cert_no":"제2022-084호","name":"주식회사태건","region":"경기","address":"경기도 김포시 하성면 하사로 92","agency":"경기북부지사","cert_date":"2022-12-29","phone":"031-998-3902","industry":"제조업(육가공)","industry_cat":["농림수산/식품가공","제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2022-085호","cert_no":"제2022-085호","name":"(주)크린코리아","region":"경기","address":"경기도 김포시 하성면 원산로 45-19","agency":"경기북부지사","cert_date":"2022-12-29","phone":"031-997-9090","industry":"세탁업","industry_cat":["세탁업"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2023-040호","cert_no":"제2023-040호","name":"주식회사 새날드림","region":"서울","address":"서울특별시 강서구 양천로 620, 1404호(등촌동)","agency":"서울남부지사","cert_date":"2023-08-24","phone":"02-6959-1855","industry":"서비스업(건물위생관리)","industry_cat":["청소/미화"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2023-060호","cert_no":"제2023-060호","name":"해피팜 협동조합","region":"서울","address":"서울특별시 강서구 마곡중앙5로 지하9, 상가 14호","agency":"서울남부지사","cert_date":"2023-11-17","phone":"02-3663-6141","industry":"작물재배업","industry_cat":["기타/서비스업"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2023-089호","cert_no":"제2023-089호","name":"주식회사 경기산업(Gyeonggi Industrial Co.,Ltd)","region":"경기","address":"경기도 파주시 광탄면 방축길 113","agency":"경기북부지사","cert_date":"2023-12-26","phone":"010-9676-4702","industry":"세탁업","industry_cat":["세탁업"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2023-090호","cert_no":"제2023-090호","name":"(주)두레드림스","region":"경기","address":"경기도 고양시 일산서구 대화로 46(대화동)","agency":"경기북부지사","cert_date":"2023-12-26","phone":"031-919-2638","industry":"도소매업(커피)","industry_cat":["기타/서비스업"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2023-092호","cert_no":"제2023-092호","name":"(주)정산업","region":"경기","address":"경기도 파주시 조리읍 능안로 265번길 3-37","agency":"경기북부지사","cert_date":"2023-12-26","phone":"031-945-7057","industry":"음식점업(카페)","industry_cat":["카페/음식점"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2024-007호","cert_no":"제2024-007호","name":"(주)이지에스","region":"경기","address":"경기도 고양시 덕양구 청초로 66, 1층 132호","agency":"경기북부지사","cert_date":"2024-02-05","phone":"02-3158-5062","industry":"서비스업(청소용역)","industry_cat":["청소/미화"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2024-013호","cert_no":"제2024-013호","name":"(사)순환자원과함께하는사람들","region":"서울","address":"서울특별시 강서구 화곡로 416, 827호","agency":"서울남부지사","cert_date":"2024-04-23","phone":"02-2131-4324","industry":"비철금속재생 및 종합재활용","industry_cat":["기타/서비스업"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2024-014호","cert_no":"제2024-014호","name":"(주)한아테크","region":"경기","address":"경기도 김포시 양촌읍 황금3로 20","agency":"경기북부지사","cert_date":"2024-05-03","phone":"032-572-1230","industry":"제조업, 건설업","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2024-017호","cert_no":"제2024-017호","name":"주식회사 원에어테크","region":"경기","address":"경기도 파주시 월롱면 정문로293번길 101 주식회사 원에어테크","agency":"경기북부지사","cert_date":"2024-05-13","phone":"031-941-8856","industry":"제조업(여과기)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2024-026호","cert_no":"제2024-026호","name":"(주)티엔티","region":"경기","address":"경기도 파주시 광탄면 보광로 1075","agency":"경기북부지사","cert_date":"2024-06-20","phone":"031-942-2061","industry":"제조업(가구 등)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2024-030호","cert_no":"제2024-030호","name":"주식회사 올모일산","region":"경기","address":"경기도 고양시 일산동구 대산로25(정발산동)","agency":"경기북부지사","cert_date":"2024-07-18","phone":"031-922-5152","industry":"문화예술(미술품 판매)","industry_cat":["기타/서비스업"],"category":"자회사","type":"본점","district":"고양시"},{"id":"제2024-033호","cert_no":"제2024-033호","name":"(주)팝업북코리아","region":"경기","address":"경기도 고양시 덕양구 무원로 6번길 36, 501호","agency":"경기북부지사","cert_date":"2024-07-19","phone":"070-8261-6174","industry":"출판업(서적)","industry_cat":["인쇄/출판/디자인"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2024-040호","cert_no":"제2024-040호","name":"주식회사 더함플러스","region":"경기","address":"경기도 고양시 일산동구 문원길 30-61","agency":"경기북부지사","cert_date":"2024-08-12","phone":"031-975-4117","industry":"제조업(금속문, 창, 셔터)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2024-044호","cert_no":"제2024-044호","name":"가능(주)","region":"서울","address":"서울특별시 강서구 양천로 620, 비즈니스센터 1405호","agency":"서울남부지사","cert_date":"2024-08-19","phone":"02-493-8944","industry":"경호업","industry_cat":["기타/서비스업"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2024-067호","cert_no":"제2024-067호","name":"주식회사 아이씨엠비전","region":"서울","address":"서울특별시 강서구 양천로 424, 제10층 제1018호(등촌동)","agency":"서울남부지사","cert_date":"2024-10-11","phone":"010-2693-4902","industry":"제조업(영상감시장치 등), 서비스(물류업)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2024-070호","cert_no":"제2024-070호","name":"(주)신영엘에스티","region":"경기","address":"경기도 파주시 광탄면 진지로 41","agency":"경기북부지사","cert_date":"2024-10-11","phone":"031-944-3990","industry":"제조업(실험대)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2024-087호","cert_no":"제2024-087호","name":"삼흥산업(주)","region":"경기","address":"경기도 파주시 조리읍 명봉산로 207-20","agency":"경기북부지사","cert_date":"2024-12-02","phone":"031-977-0400","industry":"제조업(펌프)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"파주시"},{"id":"제2024-098호","cert_no":"제2024-098호","name":"봉황기업","region":"경기","address":"경기도 김포시 풍무로 112 (풍무동)","agency":"경기북부지사","cert_date":"2024-12-16","phone":"031-982-2687","industry":"세탁업","industry_cat":["세탁업"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2024-110호","cert_no":"제2024-110호","name":"주식회사 에스더블유","region":"경기","address":"경기도 김포시 양촌읍 황금산단1로 79","agency":"경기북부지사","cert_date":"2024-12-26","phone":"031-983-0167","industry":"제조업(펌프)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2024-113호","cert_no":"제2024-113호","name":"(주)지앤지대양","region":"서울","address":"서울특별시 강서구 마곡중앙4로 10, A동 9층 921~923호(마곡동)","agency":"서울남부지사","cert_date":"2024-12-26","phone":"02-2666-5643","industry":"서비스업(건물종합관리)","industry_cat":["기타/서비스업"],"category":"자회사","type":"본점","district":"강서구"},{"id":"제2024-121호","cert_no":"제2024-121호","name":"주식회사 동원푸드빌","region":"경기","address":"경기도 김포시 대곶면 율생중앙로 184-6, 가동 2층","agency":"경기북부지사","cert_date":"2024-12-30","phone":"070-8691-2856","industry":"제조업(식육포장)","industry_cat":["농림수산/식품가공","제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2024-125호","cert_no":"제2024-125호","name":"(주)온누리산업","region":"서울","address":"서울특별시 강서구 마곡중앙4로 18, 비동 8층 802호(마곡동)","agency":"서울남부지사","cert_date":"2024-12-30","phone":"010-4395-5425","industry":"인력파견업(경비, 미화)","industry_cat":["청소/미화","시설관리/경비"],"category":"자회사","type":"본점","district":"강서구"},{"id":"제2024-131호","cert_no":"제2024-131호","name":"(주)메디탁","region":"경기","address":"경기도 김포시 월곶면 애기봉로 515","agency":"경기북부지사","cert_date":"2024-12-30","phone":"031-981-4810","industry":"서비스업(세탁업)","industry_cat":["세탁업"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2025-026호","cert_no":"제2025-026호","name":"오케이정형외과의원","region":"경기","address":"경기도 고양시 일산동구 숲속마을1로 77, 2층 201호","agency":"경기북부지사","cert_date":"2025-04-09","phone":"031-902-5555","industry":"보건업(정형외과)","industry_cat":["보건/안마"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2025-027호","cert_no":"제2025-027호","name":"(주)한울재","region":"경기","address":"경기도 고양시 덕양구 통일로 140, 에이동, 119호","agency":"경기북부지사","cert_date":"2025-04-28","phone":"02-352-6672","industry":"인쇄업(다이어리)","industry_cat":["인쇄/출판/디자인"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2025-050호","cert_no":"제2025-050호","name":"제일기계공업(주)","region":"경기","address":"경기도 김포시 대곶면 대명항로 205번길 30","agency":"경기북부지사","cert_date":"2025-07-28","phone":"031-987-2434","industry":"제조업(수중펌프)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2025-093호","cert_no":"제2025-093호","name":"주식회사 지플랜","region":"경기","address":"경기도 김포시 김포한강10로133번길 107, 씨동 843호","agency":"경기북부지사","cert_date":"2025-10-31","phone":"010-9124-6756","industry":"사무지원서비스업","industry_cat":["콜센터/사무지원"],"category":"자회사","type":"본점","district":"김포시"},{"id":"제2025-096호","cert_no":"제2025-096호","name":"㈜브라보비버파주","region":"경기","address":"경기도 파주시 중앙로 328, 9층 905~908호","agency":"경기북부지사","cert_date":"2025-10-31","phone":"031-948-1722","industry":"도소매업(포장 및 충전업)","industry_cat":["기타/서비스업"],"category":"자회사","type":"본점","district":"파주시"},{"id":"제2025-097호","cert_no":"제2025-097호","name":"㈜행복나눔","region":"경기","address":"경기도 파주시 문산읍 방촌로 1695-21, 2층","agency":"경기북부지사","cert_date":"2025-10-31","phone":"031-954-3670","industry":"카페, 일반음식업","industry_cat":["카페/음식점"],"category":"자회사","type":"본점","district":"파주시"},{"id":"제2025-105호","cert_no":"제2025-105호","name":"일산척정형외과의원","region":"경기","address":"경기도 고양시 일산서구 고양대로 666, 상가동 D201~205호","agency":"경기북부지사","cert_date":"2025-11-13","phone":"031-876-6666","industry":"보건업(정형외과)","industry_cat":["보건/안마"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2025-126호","cert_no":"제2025-126호","name":"㈜썬누리에너지","region":"경기","address":"경기도 고양시 일산동구 견달산로 384","agency":"경기북부지사","cert_date":"2025-12-15","phone":"-","industry":"제조업(열선, 온열장치)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2026-004호","cert_no":"제2026-004호","name":"주식회사 스태프링크","region":"서울","address":"서울특별시 강서구 양천로47길 40, 205호","agency":"서울남부지사","cert_date":"2026-01-19","phone":"02-6956-0221","industry":"정보통신업","industry_cat":["기타/서비스업"],"category":"일반","type":"본점","district":"강서구"},{"id":"제2026-005호","cert_no":"제2026-005호","name":"사단법인 공감과어울림","region":"경기","address":"경기도 김포시 고촌읍 김포대로 332, 412호","agency":"경기북부지사","cert_date":"2026-01-28","phone":"031-991-9995","industry":"제조업(배전반)","industry_cat":["전기/조명/전자","제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2026-010호","cert_no":"제2026-010호","name":"주식회사 트윈에프디","region":"경기","address":"경기도 고양시 덕양구 고골길 116번길 14-33, 지하","agency":"경기북부지사","cert_date":"2026-02-09","phone":"070-7707-0132","industry":"제조 및 도소매업","industry_cat":["기타/서비스업"],"category":"일반","type":"본점","district":"고양시"},{"id":"제2026-013호","cert_no":"제2026-013호","name":"㈜엠에스","region":"경기","address":"경기도 김포시 승가로 76번길 104-17","agency":"경기북부지사","cert_date":"2026-02-09","phone":"031-998-2222","industry":"제조업(침구류)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2026-027호","cert_no":"제2026-027호","name":"주식회사 빌시스","region":"경기","address":"경기도 김포시 하성면 하성로 622","agency":"경기북부지사","cert_date":"2026-05-13","phone":"031-996-8970","industry":"제조업(기타목재가구)","industry_cat":["제조업(기타)"],"category":"일반","type":"본점","district":"김포시"},{"id":"제2013-003호_오피스메카㈜_경기북부지사_2","cert_no":"제2013-003호","name":"오피스메카㈜ 경기북부지사","region":"경기","address":"경기 고양시 덕양구 으뜸로 110, 2동 1118호, 1119호","agency":"서울","cert_date":"2013-06-19","phone":"1588-7993","industry":"기념품 및 판촉물 등","industry_cat":["기타/서비스업"],"category":"일반","type":"분사무소","parent":"(주)오피스메카","district":"고양시"},{"id":"제2013-004호_㈜뉴덕흥기업_5","cert_no":"제2013-004호","name":"㈜뉴덕흥기업","region":"경기","address":"경기도 고양시 일산동구 공릉천로 126","agency":"서울","cert_date":"2013-06-19","phone":"031-964-0898","industry":"서비스업(세탁)","industry_cat":["세탁업"],"category":"일반","type":"분사무소","parent":"(주)뉴덕흥기업","district":"고양시"},{"id":"제2013-004호_㈜뉴덕흥기업_6","cert_no":"제2013-004호","name":"㈜뉴덕흥기업","region":"경기","address":"경기도 고양시 일산동구 지영동 1092","agency":"서울","cert_date":"2013-06-19","phone":"031-964-5505","industry":"제조업(콘크리트 벽돌)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"(주)뉴덕흥기업","district":"고양시"},{"id":"제2013-049호_이노위드㈜_30","cert_no":"제2013-049호","name":"이노위드㈜","region":"경기","address":"경기도 파주시 문산읍 휴암로 570","agency":"광주","cert_date":"2013-06-19","phone":"062-950-0128","industry":"서비스(청소용역,도소매)","industry_cat":["청소/미화"],"category":"자회사","type":"분사무소","parent":"이노위드 주식회사","district":"파주시"},{"id":"제2013-075호_㈜행복누리_마곡지점_42","cert_no":"제2013-075호","name":"㈜행복누리 마곡지점","region":"서울","address":"서울특별시 강서구 마곡중앙10로 10 E6동 M층(마곡사이언스파크)","agency":"충북","cert_date":"2013-06-19","phone":"043-279-3080","industry":"음식점업(매점 등)","industry_cat":["카페/음식점"],"category":"자회사","type":"분사무소","parent":"주식회사 행복누리","district":"강서구"},{"id":"제2013-089호_㈜나눔누리_52","cert_no":"제2013-089호","name":"㈜나눔누리","region":"경기","address":"경기도 파주시 월롱면 엘씨디로 231(덕은리)","agency":"경북","cert_date":"2013-06-19","phone":"070-7510-7870","industry":"사업지원서비스업(사내카페, 청소, 스팀세차 등)","industry_cat":["청소/미화","세차/차량관리","카페/음식점"],"category":"자회사","type":"분사무소","parent":"(주)나눔누리","district":"파주시"},{"id":"제2013-089호_㈜나눔누리_지에스25_A1점_55","cert_no":"제2013-089호","name":"㈜나눔누리 지에스25 A1점","region":"경기","address":"경기도 파주시 월롱면 엘지로 245 A1동 2층","agency":"경북","cert_date":"2025-03-07","phone":"-","industry":"체인화 편의점","industry_cat":["기타/서비스업"],"category":"자회사","type":"분사무소","parent":"(주)나눔누리","district":"파주시"},{"id":"제2013-089호_㈜나눔누리_지에스25_R&D점_56","cert_no":"제2013-089호","name":"㈜나눔누리 지에스25 R&D점","region":"경기","address":"경기도 파주시 월롱면 엘지로 245 R&D동 15층","agency":"경북","cert_date":"2025-03-07","phone":"-","industry":"체인화 편의점","industry_cat":["기타/서비스업"],"category":"자회사","type":"분사무소","parent":"(주)나눔누리","district":"파주시"},{"id":"제2013-089호_㈜나눔누리_지에스25_A3점_57","cert_no":"제2013-089호","name":"㈜나눔누리 지에스25 A3점","region":"경기","address":"경기도 파주시 월롱면 엘지로 245 A3동","agency":"경북","cert_date":"2025-04-01","phone":"-","industry":"체인화 편의점","industry_cat":["기타/서비스업"],"category":"자회사","type":"분사무소","parent":"(주)나눔누리","district":"파주시"},{"id":"제2013-089호_㈜나눔누리_지에스25_A2점_58","cert_no":"제2013-089호","name":"㈜나눔누리 지에스25 A2점","region":"경기","address":"경기도 파주시 월롱면 엘지로 245 A2동 2층","agency":"경북","cert_date":"2026-04-14","phone":"-","industry":"체인화 편의점","industry_cat":["기타/서비스업"],"category":"자회사","type":"분사무소","parent":"(주)나눔누리","district":"파주시"},{"id":"제2013-089호_㈜나눔누리_씨유케이트_A점_59","cert_no":"제2013-089호","name":"㈜나눔누리 씨유케이트 A점","region":"경기","address":"경기도 파주시 월롱면 엘지로 245","agency":"경북","cert_date":"2025-06-09","phone":"-","industry":"체인화 편의점","industry_cat":["기타/서비스업"],"category":"자회사","type":"분사무소","parent":"(주)나눔누리","district":"파주시"},{"id":"제2013-089호_㈜나눔누리_지에스25_파주_미니편의점_A_60","cert_no":"제2013-089호","name":"㈜나눔누리 지에스25 파주 미니편의점 A","region":"경기","address":"경기도 파주시 월롱면 엘지로 245","agency":"경북","cert_date":"2026-01-12","phone":"-","industry":"체인화 편의점","industry_cat":["기타/서비스업"],"category":"자회사","type":"분사무소","parent":"(주)나눔누리","district":"파주시"},{"id":"제2013-122호_㈜레드스톤시스템_삼송지점_68","cert_no":"제2013-122호","name":"㈜레드스톤시스템 삼송지점","region":"경기","address":"경기도 고양시 덕양구 신원1로24","agency":"서울","cert_date":"2013-11-08","phone":"02-713-0863","industry":"제조업(컴퓨터및주변기기)","industry_cat":["제조업(기타)","IT/소프트웨어"],"category":"일반","type":"분사무소","parent":"(주)레드스톤시스템","district":"고양시"},{"id":"제2015-018호_(사)장애인인권센터ICT사업단_84","cert_no":"제2015-018호","name":"(사)장애인인권센터ICT사업단","region":"경기","address":"경기도 고양시 덕양구 향동로 217 3층 F336,F337,F338호","agency":"서울남부","cert_date":"2015-07-01","phone":"02-6123-4400","industry":"제조업(CCTV,전광판,전산업부,조명기구)","industry_cat":["전기/조명/전자","제조업(기타)"],"category":"일반","type":"분사무소","parent":"장애인인권센터","district":"고양시"},{"id":"제2015-022호_(사)한마음장애인복지회_크린테크_91","cert_no":"제2015-022호","name":"(사)한마음장애인복지회 크린테크","region":"경기","address":"경기도 김포시 김포한강4로571, 2층 204호","agency":"충남","cert_date":"2015-07-30","phone":"041-583-8815","industry":"서비스업(청소용역, 에어컨유지보수 등)","industry_cat":["청소/미화"],"category":"일반","type":"분사무소","parent":"사단법인한마음장애인복지회","district":"김포시"},{"id":"제2015-042호_㈜케이두레_증미지점_98","cert_no":"제2015-042호","name":"㈜케이두레 증미지점","region":"서울","address":"서울특별시 강서구 양천로556, 5층 502,503, 504호","agency":"서울남부","cert_date":"2025-11-27","phone":"010-2776-3413","industry":"교육서비스업(요가, 필라테스)","industry_cat":["기타/서비스업"],"category":"일반","type":"분사무소","parent":"주식회사케이두레","district":"강서구"},{"id":"제2015-042호_㈜케이두레_파주지점_99","cert_no":"제2015-042호","name":"㈜케이두레 파주지점","region":"경기","address":"경기도 파주시 신남로 5-60","agency":"서울남부","cert_date":"2025-11-27","phone":"031-943-4425","industry":"제조업(화장지, 점보롤류)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"주식회사케이두레","district":"파주시"},{"id":"제2015-053호_㈜태건비에프(본점)_100","cert_no":"제2015-053호","name":"㈜태건비에프(본점)","region":"경기","address":"경기도 고양시 일산서구 덕산로57번길 23","agency":"경기북부","cert_date":"2015-12-29","phone":"031-923-6400","industry":"제조업(가설분전반)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"(주)태건비에프","district":"고양시"},{"id":"제2016-048호_㈜행복마루_마곡지점_119","cert_no":"제2016-048호","name":"㈜행복마루 마곡지점","region":"서울","address":"서울 강서구 마곡중앙10로 70, 지하1층(엘지사이언스파크)","agency":"서울","cert_date":"2016-09-23","phone":"02-6941-0907","industry":"사업 서비스업(미화 등)","industry_cat":["청소/미화"],"category":"자회사","type":"분사무소","parent":"(주)행복마루","district":"강서구"},{"id":"제2018-025호_주식회사_그린누리_마곡영업소_162","cert_no":"제2018-025호","name":"주식회사 그린누리 마곡영업소","region":"서울","address":"서울특별시 강서구 마곡중앙10로 30, E4동 1층","agency":"충북","cert_date":"2018-06-07","phone":"052-231-3332","industry":"소매업(카페) 및 서비스업(청소 등)","industry_cat":["청소/미화","카페/음식점"],"category":"자회사","type":"분사무소","parent":"주식회사 그린누리","district":"강서구"},{"id":"제2018-027호_(사)우리들행복나눔_인쇄사업단_163","cert_no":"제2018-027호","name":"(사)우리들행복나눔 인쇄사업단","region":"경기","address":"경기도 고양시 일산서구 덕산로 196-6","agency":"경기","cert_date":"2018-06-14","phone":"031-442-0470","industry":"제조업(인쇄물)","industry_cat":["인쇄/출판/디자인","제조업(기타)"],"category":"일반","type":"분사무소","parent":"사단법인 우리들 행복나눔","district":"고양시"},{"id":"제2019-015호_(주)제이투컴퍼니_191","cert_no":"제2019-015호","name":"(주)제이투컴퍼니","region":"경기","address":"경기도 고양시 덕양구 향기로 180 지2층 FB 204호","agency":"경기","cert_date":"2026-02-03","phone":"070-8802-7118","industry":"제조업(CCTV, LED등)","industry_cat":["전기/조명/전자","제조업(기타)"],"category":"일반","type":"분사무소","parent":"(주)제이투컴퍼니","district":"고양시"},{"id":"제2019-046호_㈜신성피엔텍_서울지사_203","cert_no":"제2019-046호","name":"㈜신성피엔텍 서울지사","region":"서울","address":"서울특별시 강서구 마곡서로 158, 11층 1105호(마곡동, 마곡센트럴타워2)","agency":"인천","cert_date":"2019-10-30","phone":"02-2659-4413","industry":"제조업(복사용지 등)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"(주)신성피엔텍","district":"강서구"},{"id":"제2019-063호_사단법인_내일을여는멋진여성_중증장애인사업단_208","cert_no":"제2019-063호","name":"사단법인 내일을여는멋진여성 중증장애인사업단","region":"경기","address":"경기도 파주시 지목로75번길 14, 1동, 2동동(신촌동)","agency":"서울남부","cert_date":"2019-12-09","phone":"02-761-7482","industry":"인쇄,판촉물","industry_cat":["인쇄/출판/디자인"],"category":"일반","type":"분사무소","parent":"(사)내일을여는멋진여성","district":"파주시"},{"id":"제2019-063호_치즈팩토리_209","cert_no":"제2019-063호","name":"치즈팩토리","region":"서울","address":"서울특별시 강서구 양천로 424, 지1층 제비108호(등촌동, 가양역 데시앙플렉스 지식산업센터)","agency":"서울남부","cert_date":"2019-12-09","phone":"02-761-7482","industry":"제조업(인쇄 출판 사무용지류 등)","industry_cat":["인쇄/출판/디자인","제조업(기타)"],"category":"일반","type":"분사무소","parent":"(사)내일을여는멋진여성","district":"강서구"},{"id":"제2019-081호_사단법인_장애인고용진흥회_제2파주사업소_212","cert_no":"제2019-081호","name":"사단법인 장애인고용진흥회 제2파주사업소","region":"경기","address":"경기도 파주시 산남로 5-60, 라동(산남동)","agency":"서울남부","cert_date":"2019-12-20","phone":"031-945-7678","industry":"제조업(마스크, 화장지)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"장애인고용진흥회","district":"파주시"},{"id":"제2019-081호_사단법인_장애인고용진흥회_파주사업소_213","cert_no":"제2019-081호","name":"사단법인 장애인고용진흥회 파주사업소","region":"경기","address":"경기도 파주시 산남로 157번길 30 가동","agency":"서울남부","cert_date":"2019-12-20","phone":"031-945-7678","industry":"제조업(화장지, 섬유의류 등)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"장애인고용진흥회","district":"파주시"},{"id":"제2020-012호_(사)한국장애인미래정책포럼산전사업단_220","cert_no":"제2020-012호","name":"(사)한국장애인미래정책포럼산전사업단","region":"경기","address":"경기도 파주시 광탄면 보광로 1541","agency":"서울남부","cert_date":"2020-03-17","phone":"031-945-7602","industry":"제조업(배전반, 프로세스제어반 등)","industry_cat":["전기/조명/전자","제조업(기타)"],"category":"일반","type":"분사무소","parent":"(사)한국장애인미래정책포럼","district":"파주시"},{"id":"제2021-061호_(사)대한문화체육교육협회_동우에스아이_257","cert_no":"제2021-061호","name":"(사)대한문화체육교육협회 동우에스아이","region":"경기","address":"경기도 김포시 월곶면 군하로 71","agency":"대전","cert_date":"2021-10-27","phone":"042-631-5656","industry":"제조업(배전만 및 전기 자동제어반)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"(사)대한문화체육교육협회","district":"김포시"},{"id":"제2021-061호_(사)대한문화체육교육협회_가구사업부_258","cert_no":"제2021-061호","name":"(사)대한문화체육교육협회 가구사업부","region":"경기","address":"경기도 파주시 광탄면 부흥로 359번길 190, 제4동","agency":"대전","cert_date":"2021-10-27","phone":"044-864-5654","industry":"제조업(사무용가구, 주방가구)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"(사)대한문화체육교육협회","district":"파주시"},{"id":"제2021-062호_사단법인_에스디워크_새로운세상_264","cert_no":"제2021-062호","name":"사단법인 에스디워크 새로운세상","region":"경기","address":"경기도 파주시 교하로863번길 37, 1동,2동(문발동)","agency":"서울남부","cert_date":"2021-10-27","phone":"070-4754-9313","industry":"제조업(복사지용지, 피복 등)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"사단법인 에스디워크","district":"파주시"},{"id":"제2021-062호_사단법인_에스디워크_동행_265","cert_no":"제2021-062호","name":"사단법인 에스디워크 동행","region":"서울","address":"서울특별시 강서구 화곡로 416, 1118호(등촌동, 가양역 더스카이벨리5차 지식산업센터)","agency":"서울남부","cert_date":"2021-10-27","phone":"031-949-4566","industry":"제조 및 서비스업(인쇄물, 현수막, 행사관련 등)","industry_cat":["인쇄/출판/디자인"],"category":"일반","type":"분사무소","parent":"사단법인 에스디워크","district":"강서구"},{"id":"제2021-062호_사단법인_에스디워크_서울지사_266","cert_no":"제2021-062호","name":"사단법인 에스디워크 서울지사","region":"서울","address":"서울특별시 강서구 화곡로 416, 지하1층 B110호(등촌동, 가양역 더스카이벨리5차 지식산업센터)","agency":"서울남부","cert_date":"2021-10-27","phone":"02-2272-4211","industry":"제조 및 서비스업(인쇄물, 현수막, 행사관련 등)","industry_cat":["인쇄/출판/디자인"],"category":"일반","type":"분사무소","parent":"사단법인 에스디워크","district":"강서구"},{"id":"제2021-080호_한국장애인근로복지협회_기전사업단_276","cert_no":"제2021-080호","name":"한국장애인근로복지협회 기전사업단","region":"경기","address":"경기도 김포시 대곶면 오니산로 108","agency":"서울북부","cert_date":"2021-11-26","phone":"02-433-2290","industry":"제조업(상하수기계장치 구성품)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"사단법인 한국장애인근로복지협회","district":"김포시"},{"id":"제2021-093호_세상_㈜_(본점)_279","cert_no":"제2021-093호","name":"세상 ㈜ (본점)","region":"경기","address":"경기도 파주시 법원읍 화합로 420","agency":"경기북부","cert_date":"2021-12-15","phone":"031-939-2301","industry":"세탁업(산업용 세탁)","industry_cat":["세탁업"],"category":"일반","type":"분사무소","parent":"세상 (주)","district":"파주시"},{"id":"제2021-093호_세상_㈜_(김포지사)_280","cert_no":"제2021-093호","name":"세상 ㈜ (김포지사)","region":"경기","address":"경기도 김포시 태장로 765, 522호","agency":"경기북부","cert_date":"2021-12-15","phone":"031-939-2301","industry":"세탁업(산업용 세탁)","industry_cat":["세탁업"],"category":"일반","type":"분사무소","parent":"세상 (주)","district":"김포시"},{"id":"제2022-026호_(사)행복일자리운동본부_피앤엠사업단_321","cert_no":"제2022-026호","name":"(사)행복일자리운동본부 피앤엠사업단","region":"경기","address":"경기 고양시 덕양구 향동로217, 2층 에프211호","agency":"서울남부","cert_date":"2022-06-28","phone":"02-6048-3010","industry":"펌프 제조","industry_cat":["기타/서비스업"],"category":"일반","type":"분사무소","parent":"사단법인행복일자리운동본부","district":"고양시"},{"id":"제2022-033호_(사)한빛장애인협회(기전사업단)_322","cert_no":"제2022-033호","name":"(사)한빛장애인협회(기전사업단)","region":"경기","address":"경기도 김포시 대곶면 산자뫼로 127-22, 127-16","agency":"경기북부","cert_date":"2022-08-17","phone":"-","industry":"제조업(폐수, 상하수 처리기자재)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"(사)한빛장애인협회","district":"김포시"},{"id":"제2022-033호_(사)한빛장애인협회(환경사업단)_323","cert_no":"제2022-033호","name":"(사)한빛장애인협회(환경사업단)","region":"경기","address":"경기도 김포시 대곶면 산자뫼로 127-22","agency":"경기북부","cert_date":"2022-08-17","phone":"-","industry":"제조업(폐수, 상하수 처리기자재)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"(사)한빛장애인협회","district":"김포시"},{"id":"제2022-069호_주식회사_이랑(서울지점)_331","cert_no":"제2022-069호","name":"주식회사 이랑(서울지점)","region":"서울","address":"서울특별시 강서구 마곡중앙6로 45, A동 6층 609-A19호(마곡동, 리더스퀘어마곡)","agency":"경기서부","cert_date":"2022-12-16","phone":"031-469-2606","industry":"도매 및 소매(판촉물, 기념품, 문구용품, 경인쇄업 등)","industry_cat":["인쇄/출판/디자인"],"category":"일반","type":"분사무소","parent":"(주)이랑","district":"강서구"},{"id":"제2023-043호_서울특별시지부_347","cert_no":"제2023-043호","name":"서울특별시지부","region":"서울","address":"서울 강서구 공항대로 247, C동 6층 23호","agency":"서울","cert_date":"2023-09-05","phone":"070-4288-8030","industry":"장애인 복지","industry_cat":["기타/서비스업"],"category":"일반","type":"분사무소","parent":"사단법인한국장애인녹색재단","district":"강서구"},{"id":"제2023-048호_(사)한국장애인소비자연합_인쇄사업단_353","cert_no":"제2023-048호","name":"(사)한국장애인소비자연합 인쇄사업단","region":"경기","address":"경기도 고양시 일산 동구 공릉천로 102-1","agency":"서울남부","cert_date":"2023-10-25","phone":"070-7728-7785","industry":"인쇄","industry_cat":["인쇄/출판/디자인"],"category":"일반","type":"분사무소","parent":"사단법인 한국장애인소비자연합","district":"고양시"},{"id":"제2024-038호_(사단법인)한국근로장애인진흥회_다원디자인프린팅_396","cert_no":"제2024-038호","name":"(사단법인)한국근로장애인진흥회 다원디자인프린팅","region":"경기","address":"경기도 고양시 일산동구 장대길 84, 1층(장항동)","agency":"인천","cert_date":"2024-08-08","phone":"032-435-8857","industry":"제조업(인쇄 등)","industry_cat":["인쇄/출판/디자인","제조업(기타)"],"category":"일반","type":"분사무소","parent":"(사)한국근로장애인진흥회","district":"고양시"},{"id":"제2024-087호_삼흥산업㈜(창만공장)_403","cert_no":"제2024-087호","name":"삼흥산업㈜(창만공장)","region":"경기","address":"경기도 파주시 광탄면 보광로 1336-7","agency":"경기북부","cert_date":"2020-07-02","phone":"031-949-6311","industry":"펌프제조업","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"삼흥산업(주)","district":"파주시"},{"id":"제2024-105호_(사)_장애인미래에너지창조연합회_스마일365의원_406","cert_no":"제2024-105호","name":"(사) 장애인미래에너지창조연합회 스마일365의원","region":"서울","address":"서울 강서구 금낭화로 127,5층","agency":"서울동부","cert_date":"2024-12-20","phone":"02-2262-5556","industry":"의료업(의료서비스)","industry_cat":["기타/서비스업"],"category":"일반","type":"분사무소","parent":"장애인미래에너지창조연합회","district":"강서구"},{"id":"제2024-106호_(사)강동장애인협회_정다운우리들_408","cert_no":"제2024-106호","name":"(사)강동장애인협회 정다운우리들","region":"경기","address":"경기도 파주시 교하로 869, 59-5, 60-4(문발동)","agency":"서울동부","cert_date":"2024-12-26","phone":"031-941-9520","industry":"제조업(인쇄물)","industry_cat":["인쇄/출판/디자인","제조업(기타)"],"category":"일반","type":"분사무소","parent":"사단법인 강동장애인협회","district":"파주시"},{"id":"제2025-024호_해드림산업㈜_김포공장_413","cert_no":"제2025-024호","name":"해드림산업㈜ 김포공장","region":"경기","address":"경기도 김포시 대곶면 대곶서로 292-20","agency":"인천","cert_date":"2025-04-09","phone":"032-567-7232","industry":"제조업(인쇄업, 위생용품 등)","industry_cat":["청소/미화","인쇄/출판/디자인","제조업(기타)"],"category":"일반","type":"분사무소","parent":"해드림산업 주식회사","district":"김포시"},{"id":"제2025-077호_(사)전국산재장애인단체연합회_아름다운동행사업소_432","cert_no":"제2025-077호","name":"(사)전국산재장애인단체연합회 아름다운동행사업소","region":"경기","address":"경기도 고양시 일산서구 덕산로 153-18(가좌동)","agency":"서울동부","cert_date":"2025-10-02","phone":"02-431-1030","industry":"제조업(화장지, 복사용지)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"사단법인 전국산재장애인단체연합회","district":"고양시"},{"id":"제2026-005호_사단법인_공감과_어울림_동우에스아이_442","cert_no":"제2026-005호","name":"사단법인 공감과 어울림 동우에스아이","region":"경기","address":"경기도 김포시 월곶면 군하로 71","agency":"경기북부","cert_date":"2026-01-28","phone":"031-991-9995","industry":"제조업(배전반 및 전기 자동제어반)","industry_cat":["전기/조명/전자","제조업(기타)"],"category":"일반","type":"분사무소","parent":"사단법인 공감과어울림","district":"김포시"},{"id":"제2026-005호_사단법인_공감과_어울림_티앤디자인_444","cert_no":"제2026-005호","name":"사단법인 공감과 어울림 티앤디자인","region":"경기","address":"경기도 파주시 광탄면 부흥로 359번길 190, 4동","agency":"경기북부","cert_date":"2026-01-28","phone":"031-991-9995","industry":"제조업(사무용가구, 주방가구)","industry_cat":["제조업(기타)"],"category":"일반","type":"분사무소","parent":"사단법인 공감과어울림","district":"파주시"}];
+const CATS = ["제조업(기타)", "기타/서비스업", "카페/음식점", "인쇄/출판/디자인", "전기/조명/전자", "세탁업", "청소/미화", "농림수산/식품가공", "보건", "콜센터/사무지원", "IT/소프트웨어", "자동차부품", "세차/차량관리", "시설관리/경비"];
+const DISTRICTS = ["김포시", "고양시", "파주시", "강서구"];
+
+let state = { district:'ALL', search:'', type:'ALL', cats:new Set(), sort:'name', visible:60 };
+
+function districtCounts(){
+  const m = {};
+  JOBS.forEach(j=>{ m[j.district]=(m[j.district]||0)+1; });
+  return m;
+}
+
+function initControls(){
+  document.getElementById('statTotal').textContent = JOBS.length.toLocaleString();
+  const counts = districtCounts();
+  const sel = document.getElementById('districtSelect');
+  DISTRICTS.slice().sort((a,b)=> (counts[b]||0)-(counts[a]||0)).forEach(r=>{
+    const opt = document.createElement('option');
+    opt.value = r; opt.textContent = `${r} (${counts[r]||0})`;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', e=>{ state.district = e.target.value; state.visible=60; render(); });
+  document.getElementById('sortSelect').addEventListener('change', e=>{
+  state.sort = e.target.value;
+  state.visible = 60;
+  render();
+});
+
+  document.getElementById('searchInput').addEventListener('input', e=>{
+    state.search = e.target.value.trim().toLowerCase(); state.visible=60; render();
+  });
+
+  document.querySelectorAll('.type-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.type-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      state.type = chip.dataset.type; state.visible=60; render();
+    });
+  });
+
+  const catRow = document.getElementById('catChipRow');
+  CATS.forEach(cat=>{
+    const chip = document.createElement('span');
+    chip.className='chip cat-chip'; chip.textContent = cat; chip.dataset.cat = cat;
+    chip.addEventListener('click', ()=>{
+      if(state.cats.has(cat)){ state.cats.delete(cat); chip.classList.remove('active'); }
+      else { state.cats.add(cat); chip.classList.add('active'); }
+      state.visible=60; render();
+    });
+    catRow.appendChild(chip);
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', ()=>{
+    state = { district:'ALL', search:'', type:'ALL', cats:new Set(), sort:'name', visible:60 };
+    document.getElementById('searchInput').value='';
+    sel.value='ALL';
+    document.getElementById('sortSelect').value='name';
+    document.querySelectorAll('.type-chip').forEach(c=>c.classList.toggle('active', c.dataset.type==='ALL'));
+    document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));
+    render();
+  });
+
+  document.getElementById('loadMoreBtn').addEventListener('click', ()=>{
+    state.visible += 60; render();
+  });
+
+  document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+  document.getElementById('overlay').addEventListener('click', closeDrawer);
+}
+
+function filteredJobs(){
+  const list = JOBS.filter(j=>{
+    if(state.district!=='ALL' && j.district!==state.district) return false;
+    if(state.type!=='ALL' && j.category!==state.type) return false;
+    if(state.cats.size>0){
+      const hit = j.industry_cat.some(c=>state.cats.has(c));
+      if(!hit) return false;
+    }
+    if(state.search){
+      const hay = (j.name+' '+j.address+' '+j.industry).toLowerCase();
+      if(!hay.includes(state.search)) return false;
+    }
+    return true;
+  });
+
+  list.sort((a,b)=>{
+    if(state.sort==='name') return a.name.localeCompare(b.name,'ko');
+    if(state.sort==='nameDesc') return b.name.localeCompare(a.name,'ko');
+    if(state.sort==='dateDesc') return new Date(b.cert_date)-new Date(a.cert_date);
+    if(state.sort==='dateAsc') return new Date(a.cert_date)-new Date(b.cert_date);
+    return 0;
+  });
+
+  return list;
+}
+
+function render(){
+  const list = filteredJobs();
+  
+  document.getElementById('statFiltered').textContent = list.length.toLocaleString();
+  document.getElementById('resultCount').textContent = `${list.length.toLocaleString()}개 사업장`;
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML='';
+  const shown = list.slice(0, state.visible);
+  document.getElementById('emptyState').style.display = list.length===0 ? 'block':'none';
+  document.getElementById('loadMoreBtn').style.display = list.length>state.visible ? 'block':'none';
+
+  const frag = document.createDocumentFragment();
+  shown.forEach(j=>{
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `
+      <div class="name-row">
+        <div class="name">${escapeHtml(j.name)}</div>
+        <span class="type-tag ${j.type==='분사무소'?'branch':'main'}">${j.type}</span>
+      </div>
+      <div class="addr">📍 ${escapeHtml(j.district)} · ${escapeHtml(shortAddr(j.address))}</div>
+      <div class="industry">${escapeHtml(j.industry)}</div>
+      <div class="tag-row">${j.industry_cat.slice(0,2).map(c=>`<span class="mini-tag cat-tag">${c}</span>`).join('')}<span class="mini-tag">${j.category}</span></div>
+    `;
+    card.addEventListener('click', ()=>{ openDrawer(j); moveMapToJob(j); });
+    frag.appendChild(card);
+  });
+  grid.appendChild(frag);
+}
+
+function shortAddr(a){ return a; }
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+let currentJob = null;
+let pendingPhotoData = null; // set when a new file is chosen but not yet saved
+let removePhotoFlag = false;
+
+function ensureUrl(u){
+  u = u.trim();
+  if(!u) return '#';
+  if(!/^https?:\/\//i.test(u)) return 'https://' + u;
+  return u;
+}
+
+function resizeImageFile(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const maxW = 1000;
+        const scale = Math.min(1, maxW / img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function openDrawer(j){
+  currentJob = j;
+  document.getElementById('drawerName').textContent = j.name;
+  document.getElementById('drawerTags').innerHTML = `
+    <span class="type-badge ${j.type==='분사무소'?'branch':'main'}">${j.type}</span>
+    <span class="cert-badge">${j.category}</span>
+  `;
+  let note = { welfare:'', size:'', condition:'', workType:'', memo:'', website:'', photoData:'', updated:'' };
+  try{
+    const res = await window.storage.get('note:'+j.id, false);
+    if(res && res.value){ note = Object.assign(note, JSON.parse(res.value)); }
+  }catch(e){ /* no saved note yet */ }
+
+  const mapUrl = 'https://map.kakao.com/?q=' + encodeURIComponent(j.address);
+  const telHref = 'tel:' + j.phone.replace(/[^0-9]/g,'');
+
+  document.getElementById('drawerBody').innerHTML = `
+    <div class="section">
+      <h3>위치</h3>
+      <div class="info-line">${escapeHtml(j.address)}</div>
+      <div class="btn-row">
+        <a class="btn primary" href="${mapUrl}" target="_blank" rel="noopener">지도에서 보기</a>
+        <a class="btn" href="${telHref}">${escapeHtml(j.phone)}</a>
+      </div>
+    </div>
+    <div class="section">
+      <h3>사업장 홈페이지</h3>
+      <input class="field" id="fWebsite" type="text" placeholder="아직 없으면 비워 두세요. 나중에 찾으면 여기에 추가할 수 있어요" value="${escapeHtml(note.website)}">
+      <div id="siteLinkRow" style="margin-top:8px;">${note.website ? `<a class="btn" href="${ensureUrl(note.website)}" target="_blank" rel="noopener">바로가기 ↗</a>` : ''}</div>
+    </div>
+    <div class="section">
+      <h3>업종 및 주요생산품</h3>
+      <div class="info-line">${escapeHtml(j.industry)}</div>
+      <div class="cat-badges" style="margin-top:8px;">${j.industry_cat.map(c=>`<span class="cat-badge">${c}</span>`).join('')}</div>
+    </div>
+    <div class="section">
+      <h3>인증 정보</h3>
+      <div class="info-line"><span class="lbl">인증번호</span>${escapeHtml(j.cert_no)}</div>
+      <div class="info-line"><span class="lbl">인증일자</span>${escapeHtml(j.cert_date)}</div>
+      <div class="info-line"><span class="lbl">관할지사</span>${escapeHtml(j.agency)}</div>
+      ${j.parent ? `<div class="info-line"><span class="lbl">본사</span>${escapeHtml(j.parent)}</div>`:''}
+    </div>
+
+    <div class="section">
+      <h3>사업장 사진</h3>
+      <div class="photo-box" id="photoBox">
+        ${note.photoData ? `<img src="${note.photoData}">` : `<span>🏢</span><span>아직 등록된 사진이 없어요</span>`}
+      </div>
+      <div class="photo-url-row">
+        <input type="file" id="photoFileInput" accept="image/*" style="flex:1;font-size:12.5px;">
+        ${note.photoData ? `<button type="button" class="btn" id="removePhotoBtn">삭제</button>` : ''}
+      </div>
+      <div class="save-note" id="photoStatus" style="text-align:left;margin-top:6px;"></div>
+    </div>
+
+    <div class="section">
+      <h3>복지 · 근무 정보 (선생님이 직접 작성)</h3>
+      <span class="field-label">복지 혜택</span>
+      <textarea id="fWelfare" rows="2" placeholder="예: 4대보험, 중식 제공, 통근버스, 명절 상여금 등">${escapeHtml(note.welfare)}</textarea>
+      <span class="field-label">사업장 규모</span>
+      <input class="field" id="fSize" type="text" placeholder="예: 전체 32명 (장애인 근로자 12명)" value="${escapeHtml(note.size)}">
+      <span class="field-label">근무형태</span>
+      <select class="field" id="fWorkType">
+        <option value="">선택 안 함</option>
+        <option value="정규직">정규직</option>
+        <option value="계약직">계약직</option>
+        <option value="시간제">시간제(파트타임)</option>
+        <option value="수습후정규직">수습 후 정규직 전환</option>
+        <option value="기타">기타</option>
+      </select>
+      <span class="field-label">근무조건</span>
+      <textarea id="fCondition" rows="2" placeholder="예: 주 5일, 09:00~18:00, 직무지도원 배치 등">${escapeHtml(note.condition)}</textarea>
+      <span class="field-label">메모 (실습/견학 후기 등)</span>
+      <textarea id="fMemo" rows="2" placeholder="현장실습이나 견학 다녀온 내용을 남겨보세요">${escapeHtml(note.memo)}</textarea>
+      <div class="save-bar">
+        <button class="save-btn" id="saveBtn">이 사업장 정보 저장</button>
+        <div class="save-note" id="saveNote">${note.updated ? '마지막 저장: '+escapeHtml(note.updated) : '입력한 내용은 이 브라우저에만 저장돼요.'}</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('fWorkType').value = note.workType || '';
+  pendingPhotoData = null;
+  removePhotoFlag = false;
+
+  const fileInput = document.getElementById('photoFileInput');
+  fileInput.addEventListener('change', async ()=>{
+    const file = fileInput.files[0];
+    if(!file) return;
+    const status = document.getElementById('photoStatus');
+    status.textContent = '사진을 불러오는 중...';
+    try{
+      const dataUrl = await resizeImageFile(file);
+      if(dataUrl.length > 4.5*1024*1024){
+        status.textContent = '사진 용량이 너무 커요. 다른 사진을 선택해 주세요.';
+        return;
+      }
+      pendingPhotoData = dataUrl;
+      removePhotoFlag = false;
+      document.getElementById('photoBox').innerHTML = `<img src="${dataUrl}">`;
+      status.textContent = '사진이 선택됐어요. 아래 저장 버튼을 눌러 저장하세요.';
+    }catch(e){
+      status.textContent = '사진을 불러오지 못했어요. 다른 파일을 시도해 주세요.';
+    }
+  });
+
+  const removeBtn = document.getElementById('removePhotoBtn');
+  if(removeBtn){
+    removeBtn.addEventListener('click', ()=>{
+      removePhotoFlag = true;
+      pendingPhotoData = null;
+      document.getElementById('photoBox').innerHTML = `<span>🏢</span><span>아직 등록된 사진이 없어요</span>`;
+      document.getElementById('photoStatus').textContent = '삭제 예정이에요. 저장 버튼을 눌러 확정하세요.';
+    });
+  }
+
+  document.getElementById('fWebsite').addEventListener('input', (e)=>{
+    document.getElementById('siteLinkRow').innerHTML = e.target.value.trim()
+      ? `<a class="btn" href="${ensureUrl(e.target.value.trim())}" target="_blank" rel="noopener">바로가기 ↗</a>` : '';
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', async ()=>{
+    let photoData = note.photoData || '';
+    if(removePhotoFlag) photoData = '';
+    if(pendingPhotoData) photoData = pendingPhotoData;
+
+    const payload = {
+      welfare: document.getElementById('fWelfare').value,
+      size: document.getElementById('fSize').value,
+      workType: document.getElementById('fWorkType').value,
+      condition: document.getElementById('fCondition').value,
+      memo: document.getElementById('fMemo').value,
+      website: document.getElementById('fWebsite').value.trim(),
+      photoData: photoData,
+      updated: new Date().toLocaleString('ko-KR')
+    };
+    try{
+      await window.storage.set('note:'+j.id, JSON.stringify(payload), false);
+      note = payload;
+      pendingPhotoData = null;
+      removePhotoFlag = false;
+      document.getElementById('saveNote').innerHTML = `<span class="saved-flash">저장됐어요 ✓</span> · ${payload.updated}`;
+      document.getElementById('photoStatus').textContent = '';
+    }catch(e){
+      document.getElementById('saveNote').textContent = '저장에 실패했어요. 사진 용량을 줄이거나 잠시 후 다시 시도해 주세요.';
+    }
+  });
+
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('drawer').classList.add('show');
+}
+
+function closeDrawer(){
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('drawer').classList.remove('show');
+}
+
+initControls();
+render();
+const map = new kakao.maps.Map(document.getElementById('map'), {center:new kakao.maps.LatLng(37.615,126.715),level:10});
+const geocoder = new kakao.maps.services.Geocoder();
+const markers = [];
+let selectedMarker=null;
+function moveMapToJob(j){ const marker=markers.find(m=>m.jobId===j.id); if(marker){ if(selectedMarker&&selectedMarker!==marker){ selectedMarker.setImage(null); clusterer.addMarker(selectedMarker); } clusterer.removeMarker(marker); marker.setMap(map); marker.setImage(new kakao.maps.MarkerImage('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',new kakao.maps.Size(24,35))); selectedMarker=marker; map.setLevel(7); map.panTo(marker.getPosition()); } }
+const clusterer = new kakao.maps.MarkerClusterer({map:map,averageCenter:true,minLevel:6});
+
+function showJobMarkers(){
+  JOBS.forEach(j=>{
+    geocoder.addressSearch(j.address,(result,status)=>{
+      if(status===kakao.maps.services.Status.OK){
+        const position=new kakao.maps.LatLng(result[0].y,result[0].x);
+        const marker=new kakao.maps.Marker({map:map,position:position});
+        kakao.maps.event.addListener(marker,'click',()=>openDrawer(j));
+        marker.jobId=j.id;
+        markers.push(marker);
+        clusterer.addMarker(marker);
+        
+      }
+    });
+  });
+}
+
+showJobMarkers();
+</script>
+</body>
+</html>
